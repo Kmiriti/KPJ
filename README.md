@@ -8,24 +8,53 @@ speculative or futuristic narratives.
 
 ---
 
-## Case Study 1: Singapore — Solar PV Deployment
+## Case Study 1: Singapore — Public Transport Utilisation
 
 ### Policy
-- **Singapore Green Plan 2030** (launched 2021)
-- Focuses on renewable energy adoption, especially solar photovoltaics.
+- **Singapore Land Transport Master Plans (LTMPs)** (iterative; e.g. LTMP 2008, 2013, 2019)
+- **Policy Goal**: To encourage a car-lite society by increasing public
+  transport mode share, improving accessibility, and guiding long-term
+  transport infrastructure investment using ridership data.
+
+Rather than a single policy intervention, Singapore’s transport planning
+relies on continuous, data-informed adjustments to rail expansion, bus
+service planning, and demand management measures.
+
 
 ### Data Source
 - Singapore Open Data Portal (data.gov.sg)
-- Dataset: Installed Solar Photovoltaic Capacity
-- Access method: Public API (no file download required)
+- Dataset: **Public Transport Utilisation – Average Public Transport Ridership**
+- Publisher: Land Transport Authority (LTA)
+- Time range: January 1995 – January 2024
+- Last updated: 09 July 2025
+- Access method: Public API (CKAN `datastore_search`)
 
 API endpoint:
 https://data.gov.sg/api/action/datastore_search
 
+Dataset ID:
+`d_75248cf2fbf340de6a746dc91ec9223c`
+
+
+### Data Fields
+- **Year**: Calendar year (YYYY)
+- **Mode**: MRT, LRT, or Public Bus
+- **Ridership**: Average daily ridership
+
+
 ### Before → After Logic
-- **Before**: Gradual increase in installed solar capacity pre-2021
-- **After**: Accelerated deployment following the Green Plan launch
-- **Evidence**: Annual installed capacity (MWp) visualized over time
+- **Before**: Lower and more uneven public transport ridership during
+  earlier stages of rail network development (1990s–early 2000s).
+- **After**: Sustained increases and shifts in ridership following major
+  network expansions, service integration, and car-lite transport policies
+  (2010s–2020s).
+- **Evidence**: Longitudinal ridership trends across modes, enabling
+  comparison of travel behavior before and after key planning phases.
+
+This dataset enables a non-speculative evaluation of how transport policies
+and infrastructure investments translate into measurable changes in
+public transport usage over time.
+
 
 ---
 
