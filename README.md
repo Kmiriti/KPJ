@@ -55,6 +55,11 @@ This dataset enables a non-speculative evaluation of how transport policies
 and infrastructure investments translate into measurable changes in
 public transport usage over time.
 
+- **dashboard links**:
+https://kmiriti.github.io/KPJ/output/singapore_transport_main_dashboard.html
+https://kmiriti.github.io/KPJ/output/singapore_transport_mode_dashboard.html
+https://kmiriti.github.io/KPJ/output/singapore_transport_annual_dashboard.html
+
 
 ---
 
