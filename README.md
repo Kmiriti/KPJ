@@ -83,7 +83,8 @@ Policy Timeline: Pilot (2013) → Expanded rollout (2017) → Full implementatio
 API endpoint:
 https://openapi.gg.go.kr/Fodndrkwstoccur
 
-Service key required: XXXX
+**Register for a service key at data.gg.go.kr**
+Service key required: {your service key} 
 
 
 ### Data Fields (Simulated for Analysis)
