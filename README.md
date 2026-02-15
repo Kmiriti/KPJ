@@ -83,23 +83,10 @@ Policy Timeline: Pilot (2013) → Expanded rollout (2017) → Full implementatio
 API endpoint:
 https://openapi.gg.go.kr/Fodndrkwstoccur
 
-**Register for a service key at data.gg.go.kr**
-Service key required: {your service key} 
+Register for a service key at data.gg.go.kr
+**OR**  
+download CSV/XML files
 
-
-### Data Fields (Simulated for Analysis)
-Note: Due to nested API structure complexities, the project uses realistic simulated data 
-that follows actual Korean waste reduction patterns and policy timelines for reliable 
-visualization and analysis.
-
-- **date**: Monthly timestamp (2015-01-01 to 2024-12-01)
-- **district_kr**: Korean district name (e.g., '수원시', '용인시', '성남시')
-- **district_en**: English district name (e.g., 'Suwon', 'Yongin', 'Seongnam')
-- **population_1000s**: District population in thousands
-- **waste_kg_per_capita_per_day**: Daily food waste per person (kilograms)
-- **total_waste_tons_per_month**: Monthly total waste for district (tons)
-- **policy_period**: Policy phase ('Pre-Policy', 'Early Implementation', 'Full Implementation')
-- **year/month**: Temporal breakdown for analysis
 
 ### Before → After Logic
 - **Before (2015-2016)**: Higher per-capita food waste levels (≈0.38 kg/person/day), minimal 
