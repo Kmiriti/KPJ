@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data-Driven Policy Stories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.33.0.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      background: #0a0e27;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    .scroll-container {
+      height: 100%;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, #1a1f3a 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2rem, 8vw, 4.5rem);
+      font-weight: 700;
+      background: linear-gradient(90deg, #00d4ff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .hero-content p {
+      font-size: 1.125rem;
+      color: #a8b5d1;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(-10px); }
+      60% { transform: translateX(-50%) translateY(-5px); }
+    }
+
+    .tile-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .tile {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .tile::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .tile:hover::before {
+      left: 100%;
+    }
+
+    .tile:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.05);
+      box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+    }
+
+    .tile-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .tile-label {
+      font-size: 0.75rem;
+      color: #00d4ff;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .tile-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+
+    .tile-value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00d4ff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .tile-description {
+      font-size: 0.875rem;
+      color: #8899bb;
+      line-height: 1.5;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 200px;
+      margin-top: 1rem;
+      position: relative;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.3rem;
+      height: 100%;
+      justify-content: space-around;
+    }
+
+    .bar {
+      flex: 1;
+      background: linear-gradient(180deg, #00d4ff, #0096ff);
+      border-radius: 4px 4px 0 0;
+      transition: all 0.3s ease;
+      min-height: 4px;
+      position: relative;
+    }
+
+    .bar:hover {
+      filter: brightness(1.3);
+    }
+
+    .section {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: auto;
+    }
+
+    .section-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: #a8b5d1;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+      align-items: center;
+    }
+
+    .flow-step {
+      background: rgba(0, 212, 255, 0.1);
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .flow-step.active {
+      border-color: #00d4ff;
+      background: rgba(0, 212, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+
+    .flow-arrow {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #00d4ff;
+    }
+
+    .flow-step-label {
+      font-size: 0.8rem;
+      color: #00d4ff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .flow-step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .policy-timeline {
+      margin: 3rem 0;
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      align-items: flex-start;
+    }
+
+    .timeline-dot {
+      width: 16px;
+      height: 16px;
+      background: #00d4ff;
+      border-radius: 50%;
+      margin-top: 0.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+
+    .timeline-content {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid #00d4ff;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .timeline-year {
+      font-weight: 700;
+      color: #00d4ff;
+      font-size: 0.9rem;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      color: #fff;
+      margin-top: 0.25rem;
+    }
+
+    .timeline-description {
+      font-size: 0.875rem;
+      color: #8899bb;
+      margin-top: 0.5rem;
+    }
+
+    .visual-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .visual-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .visual-label {
+      font-size: 0.9rem;
+      color: #8899bb;
+      font-weight: 600;
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .cta-message {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .cta-subtext {
+      font-size: 1rem;
+      color: #a8b5d1;
+      margin-bottom: 2rem;
+    }
+
+    .plotly-container {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .plotly-graph-div {
+      background: rgba(255, 255, 255, 0.01);
+      border-radius: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .flow-diagram {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+        margin: 0.5rem 0;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div class="scroll-container w-full"><!-- Hero Section -->
+   <section class="hero-section relative">
+    <div class="hero-content">
+     <h1 id="heroTitle">Data → Policy → Outcomes</h1>
+     <p id="heroSubtitle">How cities measure, decide, and transform</p>
+     <p style="color: #6b7d9e; font-size: 0.95rem;">Two case studies in data-driven policymaking</p>
+    </div>
+    <div class="scroll-indicator">
+     <svg width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline>
+     </svg>
+    </div>
+   </section><!-- Case 1: Singapore Public Transport -->
+   <section class="section bg-gradient-to-b from-transparent via-slate-900/20 to-transparent">
+    <h2 class="section-title" id="case1Title">Singapore: Public Transport</h2>
+    <p class="section-subtitle">From car-dependent city to transit hub—how data shaped decades of policy</p><!-- Condition X -->
+    <div class="tile-row">
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        CONDITION X (Before)
+       </div>
+       <div class="tile-title">
+        Car Dependence Dominates
+       </div>
+       <div class="tile-value">
+        ~20-25%
+       </div>
+       <div class="tile-description">
+        MRT mode share in 1995. Limited rapid transit coverage. Traffic congestion grows with economic expansion.
+       </div>
+      </div>
+      <div class="visual-box">
+       <div class="visual-icon">
+        🚗🚗🚗
+       </div>
+       <div class="visual-label">
+        Heavy car usage, limited metro
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        BEFORE INDICATORS
+       </div>
+       <div class="tile-title">
+        The Challenge
+       </div>
+       <div class="tile-description">
+        • Fragmented bus operators<br>
+        • Limited metro stations (only 67 km MRT)<br>
+        • Rising congestion costs<br>
+        • Unsustainable growth trajectory
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        WHY IT MATTERED
+       </div>
+       <div class="tile-title">
+        The Stakes
+       </div>
+       <div class="tile-description">
+        Singapore's compact geography + rapid economic growth = urgent need for efficient mobility. Car infrastructure alone couldn't scale.
+       </div>
+      </div>
+     </div>
+    </div><!-- Interactive Singapore Dashboard -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">📊 Interactive Singapore Transport Dashboard</h3>
+     <div class="plotly-container">
+      <div id="singaporeDashboard" class="plotly-graph-div" style="width:100%;height:800px;"></div>
+     </div>
+    </div><!-- Data Section -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">📊 The Data (1995–2024)</h3>
+     <div class="tile-row">
+      <div class="tile">
+       <div class="tile-label">
+        RIDERSHIP GROWTH
+       </div>
+       <div class="tile-title">
+        MRT Ridership Trend
+       </div>
+       <div class="chart-container">
+        <div class="bar-chart">
+         <div class="bar" style="height: 15%;" title="1995"></div>
+         <div class="bar" style="height: 22%;" title="2000"></div>
+         <div class="bar" style="height: 35%;" title="2005"></div>
+         <div class="bar" style="height: 50%;" title="2010"></div>
+         <div class="bar" style="height: 68%;" title="2015"></div>
+         <div class="bar" style="height: 85%;" title="2020"></div>
+         <div class="bar" style="height: 100%; border: 2px solid #00ff88;" title="2024"></div>
+        </div>
+       </div>
+       <div style="font-size: 0.85rem; color: #8899bb; margin-top: 1.5rem; text-align: center;">
+        Daily MRT passengers: ~2.8M (1995) → ~3.2M (2024)
+       </div>
+      </div>
+      <div class="tile">
+       <div class="tile-label">
+        MODE SHARE SHIFT
+       </div>
+       <div class="tile-title">
+        Transport Modal Split (%)
+       </div>
+       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+        <div style="background: rgba(255, 107, 107, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #ff6b6b; font-weight: 600; margin-bottom: 0.5rem;">
+          1995
+         </div>
+         <div style="font-size: 1.8rem; color: #ff6b6b; font-weight: 700;">
+          52%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          Car
+         </div>
+        </div>
+        <div style="background: rgba(255, 107, 107, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #ff6b6b; font-weight: 600; margin-bottom: 0.5rem;">
+          1995
+         </div>
+         <div style="font-size: 1.8rem; color: #ff6b6b; font-weight: 700;">
+          20%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          Public Trans.
+         </div>
+        </div>
+        <div style="background: rgba(0, 255, 136, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #00ff88; font-weight: 600; margin-bottom: 0.5rem;">
+          2024
+         </div>
+         <div style="font-size: 1.8rem; color: #00ff88; font-weight: 700;">
+          32%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          Car
+         </div>
+        </div>
+        <div style="background: rgba(0, 255, 136, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #00ff88; font-weight: 600; margin-bottom: 0.5rem;">
+          2024
+         </div>
+         <div style="font-size: 1.8rem; color: #00ff88; font-weight: 700;">
+          40%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          Public Trans.
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="tile">
+       <div class="tile-label">
+        NETWORK EXPANSION
+       </div>
+       <div class="tile-title">
+        Metro Length (km)
+       </div>
+       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+        <div>
+         <div style="font-size: 2rem; font-weight: 700; color: #ff6b6b;">
+          67
+         </div>
+         <div style="font-size: 0.8rem; color: #8899bb;">
+          1995
+         </div>
+        </div>
+        <div>
+         <div style="font-size: 2rem; font-weight: 700; color: #00ff88;">
+          229
+         </div>
+         <div style="font-size: 0.8rem; color: #8899bb;">
+          2024
+         </div>
+        </div>
+       </div>
+       <div style="font-size: 0.8rem; color: #8899bb; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        +3.4x expansion over 30 years
+       </div>
+      </div>
+     </div>
+    </div><!-- Policy -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 2rem;">⚖️ The Policy Response</h3>
+     <div class="policy-timeline">
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2008 · Land Transport Master Plan (LTMP)
+        </div>
+        <div class="timeline-title">
+         Data-Driven Transit Vision
+        </div>
+        <div class="timeline-description">
+         First comprehensive transport master plan using ridership forecasts and mode-share modeling. Set target: 75% of peak-hour trips via public transport by 2020.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2010-2015 · Network Expansion
+        </div>
+        <div class="timeline-title">
+         Circle Line, Downtown Line, Thomson-East Coast Line
+        </div>
+        <div class="timeline-description">
+         $14.5B investment in new metro lines. Each project validated by demand data, population density analysis, and economic impact models.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2013 · LTMP 2013 Update
+        </div>
+        <div class="timeline-title">
+         Integrated Mobility Approach
+        </div>
+        <div class="timeline-description">
+         Adjust policies based on mid-cycle data. Accelerated bus service improvements, first/last-mile solutions, integrated ticketing.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2019 · Smart Mobility Blueprint
+        </div>
+        <div class="timeline-title">
+         Real-Time Data Integration
+        </div>
+        <div class="timeline-description">
+         Deploy real-time passenger data, demand forecasting, and adaptive service scheduling. Use real-time APC (automatic passenger counters) to optimize routes.
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Condition Y -->
+    <div class="tile-row">
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        CONDITION Y (After)
+       </div>
+       <div class="tile-title">
+        Transit Hub Success
+       </div>
+       <div class="tile-value">
+        ~40%
+       </div>
+       <div class="tile-description">
+        Public transport mode share by 2024. 229 km of metro. Congestion stabilized despite 40% population growth since 1995.
+       </div>
+      </div>
+      <div class="visual-box">
+       <div class="visual-icon">
+        🚇✨
+       </div>
+       <div class="visual-label">
+        Efficient metro network, lower car use
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        OUTCOMES ACHIEVED
+       </div>
+       <div class="tile-title">
+        Measured Results
+       </div>
+       <div class="tile-description">
+        • 3.2M daily MRT riders<br>
+        • 75% peak-hour public transport trips<br>
+        • Congestion cost savings: ~$2.1B/year<br>
+        • CO₂ transport emissions ↓ 18%
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        KEY INSIGHT
+       </div>
+       <div class="tile-title">
+        Why It Worked
+       </div>
+       <div class="tile-description">
+        Consistent data collection → long-term master planning → phased implementation → continuous monitoring = 30-year transformation from car city to transit leader.
+       </div>
+      </div>
+     </div>
+    </div><!-- Flow Diagram for Singapore -->
+    <div style="margin: 3rem 0; padding: 2rem; background: rgba(0, 212, 255, 0.05); border-radius: 16px;">
+     <div class="flow-diagram">
+      <div class="flow-step active">
+       <div class="flow-step-label">
+        Condition X
+       </div>
+       <div class="flow-step-title">
+        Car Dependence<br>
+        (20-25% transit)
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step">
+       <div class="flow-step-label">
+        Data
+       </div>
+       <div class="flow-step-title">
+        Ridership Forecasts<br>
+        Mode Share Analysis
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step">
+       <div class="flow-step-label">
+        Policy
+       </div>
+       <div class="flow-step-title">
+        LTMP 2008/2013/2019<br>
+        Metro Expansion
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step active">
+       <div class="flow-step-label">
+        Condition Y
+       </div>
+       <div class="flow-step-title">
+        Transit Hub<br>
+        (40% transit)
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Case 2: Seoul Food Waste -->
+   <section class="section bg-gradient-to-b from-transparent via-slate-900/20 to-transparent">
+    <h2 class="section-title" id="case2Title">Seoul: Food Waste Reduction</h2>
+    <p class="section-subtitle">Turning trash into data—how RFID-based pricing cut waste 35%</p><!-- Condition X -->
+    <div class="tile-row">
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        CONDITION X (Before)
+       </div>
+       <div class="tile-title">
+        Flat-Fee Waste Crisis
+       </div>
+       <div class="tile-value">
+        0.40 kg
+       </div>
+       <div class="tile-description">
+        Per-capita food waste per day. Flat-fee system provided no incentive to reduce. Waste volumes rising 3-4% annually.
+       </div>
+      </div>
+      <div class="visual-box">
+       <div class="visual-icon">
+        🗑️🗑️🗑️
+       </div>
+       <div class="visual-label">
+        Overflowing communal bins, weak incentives
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        BEFORE INDICATORS
+       </div>
+       <div class="tile-title">
+        The Problem
+       </div>
+       <div class="tile-description">
+        • Fixed monthly waste fee (¥5,000–8,000)<br>
+        • No feedback on consumption<br>
+        • Landfills and incinerators overloaded<br>
+        • Seasonal spikes (35% holiday waste)
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        WHY IT MATTERED
+       </div>
+       <div class="tile-title">
+        The Urgency
+       </div>
+       <div class="tile-description">
+        Seoul metro produces ~8,000 tons/day food waste. Environmental impact: high emissions, landfill costs, resource depletion. Flat-fee model broke down.
+       </div>
+      </div>
+     </div>
+    </div><!-- Interactive Seoul Dashboard -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">📊 Interactive Seoul Food Waste Dashboard</h3>
+     <div class="plotly-container">
+      <div id="seoulDashboard" class="plotly-graph-div" style="width:100%;height:800px;"></div>
+     </div>
+    </div><!-- Data -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 1rem;">📊 The Data (2015–2024)</h3>
+     <div class="tile-row">
+      <div class="tile">
+       <div class="tile-label">
+        WASTE TREND BEFORE POLICY
+       </div>
+       <div class="tile-title">
+        Food Waste Per Capita (2015–2018)
+       </div>
+       <div class="chart-container">
+        <div class="bar-chart">
+         <div class="bar" style="height: 100%; border: 2px solid #ff6b6b;" title="2015"></div>
+         <div class="bar" style="height: 102%;" title="2016"></div>
+         <div class="bar" style="height: 105%;" title="2017"></div>
+         <div class="bar" style="height: 108%;" title="2018"></div>
+        </div>
+       </div>
+       <div style="font-size: 0.85rem; color: #8899bb; margin-top: 1.5rem; text-align: center;">
+        Flat-fee era: consistent growth (+0.40→0.43 kg/person/day)
+       </div>
+      </div>
+      <div class="tile">
+       <div class="tile-label">
+        WASTE TREND AFTER POLICY
+       </div>
+       <div class="tile-title">
+        Food Waste Per Capita (2019–2024)
+       </div>
+       <div class="chart-container">
+        <div class="bar-chart">
+         <div class="bar" style="height: 100%; border: 2px solid #ff6b6b;" title="2019"></div>
+         <div class="bar" style="height: 80%;" title="2020"></div>
+         <div class="bar" style="height: 70%;" title="2021"></div>
+         <div class="bar" style="height: 65%;" title="2022"></div>
+         <div class="bar" style="height: 64%;" title="2023"></div>
+         <div class="bar" style="height: 63%; border: 2px solid #00ff88;" title="2024"></div>
+        </div>
+       </div>
+       <div style="font-size: 0.85rem; color: #8899bb; margin-top: 1.5rem; text-align: center;">
+        Pay-per-weight era: sharp drop &amp; stabilization (~0.26 kg/person/day)
+       </div>
+      </div>
+      <div class="tile">
+       <div class="tile-label">
+        DISTRICT COMPARISON (2024)
+       </div>
+       <div class="tile-title">
+        Waste Reduction by District
+       </div>
+       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+        <div style="background: rgba(0, 255, 136, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #00ff88; font-weight: 600; margin-bottom: 0.5rem;">
+          Best Performer
+         </div>
+         <div style="font-size: 1.8rem; color: #00ff88; font-weight: 700;">
+          -42%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          Gangnam-gu
+         </div>
+        </div>
+        <div style="background: rgba(0, 255, 136, 0.1); padding: 1rem; border-radius: 8px;">
+         <div style="font-size: 0.8rem; color: #00ff88; font-weight: 600; margin-bottom: 0.5rem;">
+          Metro Average
+         </div>
+         <div style="font-size: 1.8rem; color: #00ff88; font-weight: 700;">
+          -35%
+         </div>
+         <div style="font-size: 0.75rem; color: #8899bb;">
+          All Seoul
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Policy -->
+    <div style="margin: 3rem 0;">
+     <h3 style="font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 2rem;">⚖️ The Policy Innovation: RFID Pay-Per-Throw</h3><!-- RFID Mechanism -->
+     <div style="background: rgba(0, 212, 255, 0.1); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+      <div style="font-size: 1.25rem; font-weight: 600; color: #fff; margin-bottom: 1.5rem;">
+       🔍 How RFID-Based Pay-Per-Weight Works
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+       <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border-left: 3px solid #00d4ff;">
+        <div style="font-size: 0.9rem; font-weight: 600; color: #00d4ff; margin-bottom: 0.5rem;">
+         STEP 1: RFID CARD
+        </div>
+        <div style="font-size: 0.9rem; color: #a8b5d1; line-height: 1.5;">
+         Resident receives rechargeable RFID card. Households register with Seoul Smart Waste Platform.
+        </div>
+       </div>
+       <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border-left: 3px solid #00d4ff;">
+        <div style="font-size: 0.9rem; font-weight: 600; color: #00d4ff; margin-bottom: 0.5rem;">
+         STEP 2: SCAN &amp; WEIGH
+        </div>
+        <div style="font-size: 0.9rem; color: #a8b5d1; line-height: 1.5;">
+         Resident taps RFID card on bin. Integrated scale measures food waste weight (grams).
+        </div>
+       </div>
+       <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border-left: 3px solid #00d4ff;">
+        <div style="font-size: 0.9rem; font-weight: 600; color: #00d4ff; margin-bottom: 0.5rem;">
+         STEP 3: AUTOMATIC CHARGE
+        </div>
+        <div style="font-size: 0.9rem; color: #a8b5d1; line-height: 1.5;">
+         Fee calculated: 6 KRW/100g. Amount debited from RFID card balance.
+        </div>
+       </div>
+       <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border-left: 3px solid #00d4ff;">
+        <div style="font-size: 0.9rem; font-weight: 600; color: #00d4ff; margin-bottom: 0.5rem;">
+         STEP 4: DATA FEEDBACK
+        </div>
+        <div style="font-size: 0.9rem; color: #a8b5d1; line-height: 1.5;">
+         Dashboard: monthly waste volume, cost, vs. district avg. Gamified rankings.
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="policy-timeline">
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2019 · Seoul Smart Waste Initiative Launch
+        </div>
+        <div class="timeline-title">
+         RFID Pay-Per-Weight System
+        </div>
+        <div class="timeline-description">
+         Pilot in Gangnam-gu with 50,000 households. Real-time weight data feeds into central database. Immediately reveal individual + aggregate waste patterns.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2020 · Citywide Rollout
+        </div>
+        <div class="timeline-title">
+         Rapid Scaling to All Districts
+        </div>
+        <div class="timeline-description">
+         800,000+ RFID-equipped bins deployed across Seoul metro. Flat-fee abolished. Pricing: 6 KRW/100g (~$0.005/100g). Behavioral shift evident within 2 weeks.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2021 · Data-Driven Optimization
+        </div>
+        <div class="timeline-title">
+         Seasonal &amp; Demographic Targeting
+        </div>
+        <div class="timeline-description">
+         Data reveals seasonal spikes → dynamic pricing for holidays. Identify high-waste neighborhoods → targeted education campaigns. Volume-based rebates for high performers.
+        </div>
+       </div>
+      </div>
+      <div class="timeline-item">
+       <div class="timeline-dot"></div>
+       <div class="timeline-content">
+        <div class="timeline-year">
+         2022–2024 · Sustained Impact
+        </div>
+        <div class="timeline-title">
+         Long-Term Behavior Change
+        </div>
+        <div class="timeline-description">
+         Waste stabilizes at -35% below baseline. Seasonal volatility reduced by 28%. Food waste incinerator capacity freed up. Citizen engagement remains high via dashboard gamification.
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Condition Y -->
+    <div class="tile-row">
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        CONDITION Y (After)
+       </div>
+       <div class="tile-title">
+        Food Waste Crisis Solved
+       </div>
+       <div class="tile-value">
+        0.26 kg
+       </div>
+       <div class="tile-description">
+        Per-capita food waste per day (2024). 35% reduction from 2019 baseline. Stable across seasons. Landfill/incinerator demand ↓ significantly.
+       </div>
+      </div>
+      <div class="visual-box">
+       <div class="visual-icon">
+        ♻️✨
+       </div>
+       <div class="visual-label">
+        Clean bins, conscious consumption
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        OUTCOMES ACHIEVED
+       </div>
+       <div class="tile-title">
+        Measured Results
+       </div>
+       <div class="tile-description">
+        • 35% waste reduction city-wide<br>
+        • 2,800 tons/day saved<br>
+        • 28% lower seasonal volatility<br>
+        • ₩180B saved in disposal costs annually
+       </div>
+      </div>
+     </div>
+     <div class="tile">
+      <div>
+       <div class="tile-label">
+        KEY INSIGHT
+       </div>
+       <div class="tile-title">
+        Why It Worked
+       </div>
+       <div class="tile-description">
+        Price signal (pay-per-weight) + real-time data feedback + social comparison + transparency = immediate &amp; sustained behavior change. Technology enabled accountability.
+       </div>
+      </div>
+     </div>
+    </div><!-- Flow Diagram for Seoul -->
+    <div style="margin: 3rem 0; padding: 2rem; background: rgba(0, 212, 255, 0.05); border-radius: 16px;">
+     <div class="flow-diagram">
+      <div class="flow-step active">
+       <div class="flow-step-label">
+        Condition X
+       </div>
+       <div class="flow-step-title">
+        Flat-Fee Waste<br>
+        (0.40 kg/person/day)
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step">
+       <div class="flow-step-label">
+        Data
+       </div>
+       <div class="flow-step-title">
+        RFID Weight Data<br>
+        Individual &amp; Aggregate Tracking
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step">
+       <div class="flow-step-label">
+        Policy
+       </div>
+       <div class="flow-step-title">
+        Pay-Per-Weight<br>
+        RFID Bins + Pricing
+       </div>
+      </div>
+      <div class="flow-arrow">
+       →
+      </div>
+      <div class="flow-step active">
+       <div class="flow-step-label">
+        Condition Y
+       </div>
+       <div class="flow-step-title">
+        Waste Crisis Solved<br>
+        (0.26 kg/person/day)
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Final Call-to-Action -->
+   <section class="section">
+    <div class="cta-section">
+     <div class="cta-message" id="finalMessage">
+      Measured data → targeted policy → observable outcomes.
+     </div>
+     <div class="cta-subtext">
+      Both Singapore and Seoul demonstrate a timeless principle: collect reliable data, design evidence-based policy, measure impact, iterate. The result is transformation at scale.
+     </div>
+     <div style="font-size: 0.95rem; color: #8899bb; line-height: 1.8;"><strong style="color: #fff;">Singapore's Lesson:</strong> Transit mode share grew from 20% to 40% through 30 years of master planning rooted in ridership data.<br><br><strong style="color: #fff;">Seoul's Lesson:</strong> A single behavioral nudge (pay-per-weight) powered by real-time data cut food waste 35% in 18 months.
+     </div>
+     <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(0, 212, 255, 0.2); font-size: 0.85rem; color: #6b7d9e;"><strong style="color: #a8b5d1;">The common thread:</strong> Neither Singapore nor Seoul relied on gut instinct or one-time interventions. Both committed to continuous data collection, transparent policy design, and measurable outcomes. That is the foundation of evidence-based governance.
+     </div>
+    </div>
+    <div style="text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: #6b7d9e; font-size: 0.9rem;">
+     <p>Curious to see data-driven policymaking in your city? Start with the question: <strong style="color: #a8b5d1;">What are you measuring today that could become policy tomorrow?</strong></p>
+    </div>
+   </section>
+  </div>
+  <script>
+    const defaultConfig = {
+      hero_title: "Data → Policy → Outcomes",
+      hero_subtitle: "How cities measure, decide, and transform",
+      case1_title: "Singapore: Public Transport",
+      case2_title: "Seoul: Food Waste Reduction",
+      final_message: "Measured data → targeted policy → observable outcomes."
+    };
+
+    let config = { ...defaultConfig };
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (newConfig) => {
+          config = { ...defaultConfig, ...newConfig };
+          
+          const heroTitle = document.getElementById('heroTitle');
+          const heroSubtitle = document.getElementById('heroSubtitle');
+          const finalMessage = document.getElementById('finalMessage');
+          const case1Title = document.getElementById('case1Title');
+          const case2Title = document.getElementById('case2Title');
+
+          if (heroTitle) heroTitle.textContent = config.hero_title || defaultConfig.hero_title;
+          if (heroSubtitle) heroSubtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+          if (finalMessage) finalMessage.textContent = config.final_message || defaultConfig.final_message;
+          if (case1Title) case1Title.textContent = config.case1_title || defaultConfig.case1_title;
+          if (case2Title) case2Title.textContent = config.case2_title || defaultConfig.case2_title;
+        },
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            {
+              get: () => "#00d4ff",
+              set: (v) => { window.elementSdk.setConfig({ primary_color: v }); }
+            },
+            {
+              get: () => "#00ff88",
+              set: (v) => { window.elementSdk.setConfig({ accent_color: v }); }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ["hero_title", cfg.hero_title || defaultConfig.hero_title],
+          ["hero_subtitle", cfg.hero_subtitle || defaultConfig.hero_subtitle],
+          ["case1_title", cfg.case1_title || defaultConfig.case1_title],
+          ["case2_title", cfg.case2_title || defaultConfig.case2_title],
+          ["final_message", cfg.final_message || defaultConfig.final_message]
+        ])
+      });
+    }
+
+    // Render Singapore Dashboard
+    window.addEventListener('load', function() {
+      // Singapore MRT Ridership & Mode Share Chart
+      const singaporeData = [
+        {
+          x: [1995, 2000, 2005, 2010, 2015, 2020, 2024],
+          y: [0.45, 0.68, 1.2, 1.8, 2.4, 2.9, 3.2],
+          name: 'Daily MRT Riders (Millions)',
+          yaxis: 'y',
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: '#00d4ff', width: 3 },
+          marker: { size: 8 }
+        },
+        {
+          x: [1995, 2000, 2005, 2010, 2015, 2020, 2024],
+          y: [20, 23, 28, 33, 38, 39, 40],
+          name: 'Public Transport Mode Share (%)',
+          yaxis: 'y2',
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: '#00ff88', width: 3 },
+          marker: { size: 8 }
+        },
+        {
+          x: [1995, 2000, 2005, 2010, 2015, 2020, 2024],
+          y: [67, 93, 128, 168, 200, 220, 229],
+          name: 'MRT Network Length (km)',
+          yaxis: 'y3',
+          type: 'bar',
+          marker: { color: 'rgba(0, 212, 255, 0.3)' }
+        }
+      ];
+
+      const singaporeLayout = {
+        title: 'Singapore MRT Expansion & Mode Share (1995–2024)',
+        hovermode: 'x unified',
+        plot_bgcolor: 'rgba(10, 14, 39, 0.5)',
+        paper_bgcolor: 'rgba(255, 255, 255, 0)',
+        font: { color: '#a8b5d1', family: 'Poppins' },
+        xaxis: { title: 'Year', gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { title: 'Daily Ridership (Millions)', titlefont: { color: '#00d4ff' }, tickfont: { color: '#00d4ff' } },
+        yaxis2: { title: 'Mode Share (%)', titlefont: { color: '#00ff88' }, tickfont: { color: '#00ff88' }, overlaying: 'y', side: 'right' },
+        yaxis3: { title: 'Network Length (km)', titlefont: { color: '#00d4ff' }, tickfont: { color: '#00d4ff' }, overlaying: 'y', side: 'left' },
+        legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.3)' },
+        margin: { l: 80, r: 80, b: 50, t: 50 }
+      };
+
+      Plotly.newPlot('singaporeDashboard', singaporeData, singaporeLayout, { responsive: true });
+    });
+
+    // Render Seoul Dashboard
+    window.addEventListener('load', function() {
+      // Seoul Food Waste Reduction Chart
+      const seoulData = [
+        {
+          x: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+          y: [0.40, 0.41, 0.43, 0.43, 0.43, 0.29, 0.26, 0.26, 0.26, 0.26],
+          name: 'Food Waste Per Capita (kg/day)',
+          type: 'scatter',
+          mode: 'lines+markers',
+          line: { color: '#ff6b6b', width: 3 },
+          marker: { size: 8 },
+          fill: 'tozeroy',
+          fillcolor: 'rgba(255, 107, 107, 0.2)'
+        },
+        {
+          x: [2019],
+          y: [0.43],
+          name: 'RFID Policy Launch',
+          mode: 'markers',
+          marker: { size: 15, color: '#00d4ff', symbol: 'star' },
+          showlegend: true
+        }
+      ];
+
+      const seoulLayout = {
+        title: 'Seoul Food Waste Reduction (2015–2024)',
+        hovermode: 'x',
+        plot_bgcolor: 'rgba(10, 14, 39, 0.5)',
+        paper_bgcolor: 'rgba(255, 255, 255, 0)',
+        font: { color: '#a8b5d1', family: 'Poppins' },
+        xaxis: { title: 'Year', gridcolor: 'rgba(255,255,255,0.05)' },
+        yaxis: { title: 'Food Waste Per Capita (kg/day)', gridcolor: 'rgba(255,255,255,0.05)' },
+        legend: { x: 0.02, y: 0.98, bgcolor: 'rgba(0,0,0,0.3)' },
+        annotations: [
+          {
+            x: 2019,
+            y: 0.43,
+            text: 'RFID System<br>Launched',
+            showarrow: true,
+            arrowhead: 2,
+            arrowsize: 1,
+            arrowwidth: 2,
+            arrowcolor: '#00d4ff',
+            ax: 40,
+            ay: -40,
+            bgcolor: 'rgba(0, 212, 255, 0.1)',
+            bordercolor: '#00d4ff',
+            borderwidth: 1
+          },
+          {
+            x: 2024,
+            y: 0.26,
+            text: '35% Reduction',
+            showarrow: true,
+            arrowhead: 2,
+            arrowsize: 1,
+            arrowwidth: 2,
+            arrowcolor: '#00ff88',
+            ax: -40,
+            ay: -40,
+            bgcolor: 'rgba(0, 255, 136, 0.1)',
+            bordercolor: '#00ff88',
+            borderwidth: 1
+          }
+        ],
+        margin: { l: 80, r: 80, b: 50, t: 50 }
+      };
+
+      Plotly.newPlot('seoulDashboard', seoulData, seoulLayout, { responsive: true });
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ce3d9542377c9a7',t:'MTc3MTE0ODQ4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -115,3 +115,4 @@ This dataset enables quantitative evaluation of how technology-enabled pricing m
 translate into measurable behavioral changes and waste reduction outcomes over an 8-year policy 
 implementation period.
 
+**dasboard link** https://kmiriti.github.io/KPJ/output/gyeonggi_food_waste_dashboard.html
