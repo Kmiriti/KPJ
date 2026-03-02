@@ -185,7 +185,7 @@ https://kmiriti.github.io/KPJ/output/gyeonggi_food_waste_dashboard.html
 
 ## Final Poster (PDF Preview)
 
-[![Poster Preview](assets/poster_thumbnail.png)](assets/A Data-Driven Urban Planning Visualization Framework for Jiading District Poster (78 x 200 cm).pdf )
+[![Poster Preview](assets/poster_thumbnail.png)](assets/poster.png)
 
 ---
 
