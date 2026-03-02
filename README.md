@@ -174,7 +174,10 @@ https://kmiriti.github.io/KPJ/output/gyeonggi_food_waste_dashboard.html
 
 ## Teaser Video
 
-[![Watch the Teaser Video](/assets/video_thumbnail.png)](https://duke.box.com/s/cw7bn638dcqy7prlu5xfenjgm9gjdqze)
+<video width="100%" controls>
+  <source src="/assets/teaser_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 3-minute overview including:
 - Scientific communication summary  
@@ -183,9 +186,14 @@ https://kmiriti.github.io/KPJ/output/gyeonggi_food_waste_dashboard.html
 
 ---
 
-## Final Poster
+## Final Poster (PDF Preview)
 
-[![View Full Poster](/assets/poster_preview.png)](https://www.canva.com/design/DAHAKKoOqmc/mjSD4U_42oqqcK3a7sJt-w/edit)
+<object data="/assets/poster_final.pdf" type="application/pdf" width="100%" height="800px">
+  <p>
+    Your browser does not support embedded PDFs.
+    <a href="/assets/poster_final.pdf">Download the poster here.</a>
+  </p>
+</object>
 
 ---
 
