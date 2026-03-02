@@ -174,17 +174,17 @@ https://kmiriti.github.io/KPJ/output/gyeonggi_food_waste_dashboard.html
 
 ## Teaser Video
 
-[![Watch the Teaser Video](assets/video_thumbnail.png)](assets/KPJ-Teaser_Video.mp4)
+[▶ Watch the Teaser Video](assets/KPJ-Teaser_Video.mp4)
 
 3-minute overview including:
 - Scientific communication summary  
 - Interactive dashboard walkthrough  
 - Team acknowledgments  
 
-
 ## Final Poster (PDF Preview)
 
 [View Poster (PDF)](assets/poster.pdf)
+
 ---
 
 # Data Governance & Reproducibility
