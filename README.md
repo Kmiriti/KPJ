@@ -12,13 +12,11 @@ By transforming governance into traceable, data-grounded narratives, this projec
 
 ---
 
-# Academic Professionalism Block
 
 ## Disclaimer
 
 This InfoVis project is for submission to INFOSCI 301 Data Visualization and Information Aesthetics, Spring 2026 at Duke Kunshan University.
 
----
 
 ## Acknowledgments
 
@@ -52,7 +50,7 @@ Establishes collaboration between students, policymakers, cultural institutions,
 
 ---
 
-## Statement of Accessibility
+## Accessibility
 
 **GitHub Repository**  
 https://github.com/Kmiriti/KPJ  
@@ -73,7 +71,7 @@ Information visualization; civic technology; urban governance; data transparency
 
 ---
 
-# Case Study 1: Singapore — Public Transport Utilisation
+# Case Study 1: Singapore -- Public Transport Utilisation
 
 ## Policy Context
 
@@ -121,7 +119,7 @@ Longitudinal multi-mode trend analysis reveals measurable behavioral shifts alig
 
 ---
 
-# Case Study 2: South Korea — RFID-Based Food Waste Reduction
+# Case Study 2: South Korea -- RFID-Based Food Waste Reduction
 
 ## Policy Context
 
